@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:14.8-alpine3.18
+    container_name: short-url-db
+    environment:
+      - POSTGRES_DB=shorturl
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data/db/data:/var/lib/postgresql/data
+    networks:
+      - short-url
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U user -d shorturl']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  short-url:
+  
