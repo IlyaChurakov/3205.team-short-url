@@ -14,9 +14,8 @@ export async function createShortUrl(
     const { originalUrl, expiresAt, alias } = req.body;
 
     if (alias) {
-      const isShortUrlWithSameAliasExists = 
-        await prisma.shortUrl.findUnique({ where: { alias } });
-      if (isShortUrlWithSameAliasExists) 
+      const isShortUrlWithSameAliasExists = await prisma.shortUrl.findUnique({ where: { alias } });
+      if (isShortUrlWithSameAliasExists)
         throw ApiError.BadRequest('Ссылка с таким алиасом уже существует');
     }
 
@@ -26,7 +25,7 @@ export async function createShortUrl(
         expiresAt,
         alias: alias || nanoid(20),
       },
-    })
+    });
 
     res.status(200).json(shortUrl);
   } catch (e) {
@@ -34,11 +33,7 @@ export async function createShortUrl(
   }
 }
 
-export async function redirectToOriginalUrl(
-  req: Request,
-  res: Response<{}>,
-  next: NextFunction,
-) {
+export async function redirectToOriginalUrl(req: Request, res: Response<{}>, next: NextFunction) {
   try {
     const { shortUrl } = req.params;
 
@@ -52,7 +47,7 @@ export async function redirectToOriginalUrl(
 
     const currentDate = new Date();
 
-    if (data.expiresAt && data.expiresAt < currentDate) 
+    if (data.expiresAt && data.expiresAt < currentDate)
       throw ApiError.Gone('Срок действия ссылки истёк');
 
     // TODO: Разобраться с ip
@@ -71,11 +66,7 @@ export async function redirectToOriginalUrl(
   }
 }
 
-export async function getShortUrlInfo(
-  req: Request,
-  res: Response<{}>,
-  next: NextFunction,
-) {
+export async function getShortUrlInfo(req: Request, res: Response<{}>, next: NextFunction) {
   try {
     const { shortUrl } = req.params;
 
@@ -94,46 +85,37 @@ export async function getShortUrlInfo(
     });
 
     res.status(200).json({
-      createdAt: data.createdAt, 
+      createdAt: data.createdAt,
       originalUrl: data.originalUrl,
-      clickCount
+      clickCount,
     });
   } catch (e) {
     return next(e);
   }
 }
 
-export async function deleteShortUrl(
-  req: Request,
-  res: Response<{}>,
-  next: NextFunction,
-) {
+export async function deleteShortUrl(req: Request, res: Response<{}>, next: NextFunction) {
   try {
     const { shortUrl } = req.params;
 
     const data = await prisma.shortUrl.delete({
       where: {
         alias: shortUrl,
-        
       },
     });
 
     if (!data) throw ApiError.NotFound('Ссылка не найдена');
 
     res.status(200).json({
-      message: 'Ссылка удалена'
+      message: 'Ссылка удалена',
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
     return next(e);
   }
 }
 
-export async function getAnalytics(
-  req: Request,
-  res: Response<{}>,
-  next: NextFunction,
-) {
+export async function getAnalytics(req: Request, res: Response<{}>, next: NextFunction) {
   try {
     const { shortUrl } = req.params;
     if (!shortUrl) throw ApiError.BadRequest('Не указан алиас ссылки');
@@ -141,7 +123,7 @@ export async function getAnalytics(
     const data = await prisma.shortUrl.findUnique({
       where: {
         alias: shortUrl,
-      }
+      },
     });
 
     if (!data) throw ApiError.NotFound('Ссылка не найдена');
@@ -162,12 +144,12 @@ export async function getAnalytics(
       take: 5,
       select: {
         ip: true,
-      }
+      },
     });
 
     res.status(200).json({
       clickCount,
-      lastIps
+      lastIps,
     });
   } catch (e) {
     return next(e);
