@@ -28,55 +28,66 @@ export async function createShortUrl(body: Record<string, unknown>) {
       body: JSON.stringify(body),
       headers: { ...baseHeaders },
     });
-
     const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
 
     return data as unknown as CreatedShortUrlResponse;
   } catch (e) {
-    console.log(e);
-    alert('Не удалось создать short url');
+    const err = e as Error;
+    alert(err.message || 'Не удалось создать ссылку');
   }
 }
 
 export async function getShortUrlInfo(shortUrl: string) {
   try {
-    const response = await fetch(`${apiUrl}/info/${shortUrl}`, {
+    const response = await fetch(`${apiUrl}/info/${encodeURIComponent(shortUrl)}`, {
       method: 'GET',
       headers: { ...baseHeaders },
     });
 
     const data = await response.json();
 
+    if (!response.ok) throw new Error(data.message);
+
     return data as unknown as ShortUrlInfoResponse;
   } catch (e) {
-    console.log(e);
-    alert('Не удалось получить информацию о short url');
+    const err = e as Error;
+    alert(err.message || 'Не удалось получить информацию');
   }
 }
 
 export async function getShortUrlAnalytics(shortUrl: string) {
   try {
-    const response = await fetch(`${apiUrl}/analytics/${shortUrl}`, {
+    const response = await fetch(`${apiUrl}/analytics/${encodeURIComponent(shortUrl)}`, {
       method: 'GET',
       headers: { ...baseHeaders },
     });
 
     const data = await response.json();
 
+    if (!response.ok) throw new Error(data.message);
+
     return data as unknown as ShortUrlAnalyticsResponse;
   } catch (e) {
-    console.log(e);
-    alert('Не удалось получить аналитику');
+    const err = e as Error;
+    alert(err.message || 'Не удалось получить аналитику');
   }
 }
 
 export async function deleteShortUrl(shortUrl: string) {
   try {
-    await fetch(`${apiUrl}/delete/${shortUrl}`, {
+    const response = await fetch(`${apiUrl}/delete/${encodeURIComponent(shortUrl)}`, {
       method: 'DELETE',
     });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message);
+
+    alert('Ссылка удалена');
   } catch (e) {
-    console.log(e);
-    alert('Не удалось удалить short url');
+    const err = e as Error;
+    alert(err.message || 'Не удалось удалить короткую ссылку');
   }
 }

@@ -9,7 +9,7 @@ import prisma from './db';
 import path from 'path';
 import { readFileSync } from 'fs';
 
-const app = express();
+export const app = express();
 
 const main = async () => {
   app.use(express.json());

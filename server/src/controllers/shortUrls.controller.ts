@@ -37,9 +37,11 @@ export async function redirectToOriginalUrl(req: Request, res: Response<{}>, nex
   try {
     const { shortUrl } = req.params;
 
+    const alias = decodeURIComponent(shortUrl.split('/api/')[1]);
+
     const data = await prisma.shortUrl.findUnique({
       where: {
-        alias: shortUrl,
+        alias,
       },
     });
 
@@ -50,8 +52,7 @@ export async function redirectToOriginalUrl(req: Request, res: Response<{}>, nex
     if (data.expiresAt && data.expiresAt < currentDate)
       throw ApiError.Gone('Срок действия ссылки истёк');
 
-    // TODO: Разобраться с ip
-    const ip = getClientIp(req) || 'unknown';
+    const ip = req.ip || 'unknown';
 
     await prisma.analytics.create({
       data: {
@@ -70,9 +71,11 @@ export async function getShortUrlInfo(req: Request, res: Response<{}>, next: Nex
   try {
     const { shortUrl } = req.params;
 
+    const alias = decodeURIComponent(shortUrl.split('/api/')[1]);
+
     const data = await prisma.shortUrl.findUnique({
       where: {
-        alias: shortUrl,
+        alias,
       },
     });
 
@@ -98,9 +101,11 @@ export async function deleteShortUrl(req: Request, res: Response<{}>, next: Next
   try {
     const { shortUrl } = req.params;
 
+    const alias = decodeURIComponent(shortUrl.split('/api/')[1]);
+
     const data = await prisma.shortUrl.delete({
       where: {
-        alias: shortUrl,
+        alias,
       },
     });
 
@@ -118,11 +123,12 @@ export async function deleteShortUrl(req: Request, res: Response<{}>, next: Next
 export async function getAnalytics(req: Request, res: Response<{}>, next: NextFunction) {
   try {
     const { shortUrl } = req.params;
-    if (!shortUrl) throw ApiError.BadRequest('Не указан алиас ссылки');
+
+    const alias = decodeURIComponent(shortUrl.split('/api/')[1]);
 
     const data = await prisma.shortUrl.findUnique({
       where: {
-        alias: shortUrl,
+        alias,
       },
     });
 

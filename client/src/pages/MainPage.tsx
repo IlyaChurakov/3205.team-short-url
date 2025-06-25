@@ -14,9 +14,9 @@ import CopyResult from '../components/CopyResult';
 import { dateFormatter } from '../shared/utils';
 
 const MainPage = () => {
-  const [shortUrl, setShortUrl] = useState<string>('');
+  const [createdShortUrl, setCreatedShortUrl] = useState<string>('');
 
-  const [alias, setAlias] = useState<string>('');
+  const [shortUrl, setShortUrl] = useState<string>('');
   const [shortUrlInfo, setShortUrlInfo] = useState<ShortUrlInfoResponse>();
   const [shortUrlAnalytics, setShortUrlAnalytics] = useState<ShortUrlAnalyticsResponse>();
 
@@ -24,26 +24,24 @@ const MainPage = () => {
     const data = await createShortUrl(values);
     if (!data) return;
 
+    setCreatedShortUrl(apiUrl + '/' + data.alias);
     setShortUrl(apiUrl + '/' + data.alias);
-    setAlias(data.alias);
   };
 
   const deleteShortUrlHandler = async (e: MouseEvent) => {
     e.preventDefault();
 
-    await deleteShortUrl(alias);
+    await deleteShortUrl(shortUrl);
 
     setShortUrlInfo(undefined);
     setShortUrlAnalytics(undefined);
-    setAlias('');
-
-    alert('Ссылка удалена');
+    setShortUrl('');
   };
 
   const getShortUrlInfoHandler = async (e: MouseEvent) => {
     e.preventDefault();
 
-    const data = await getShortUrlInfo(alias);
+    const data = await getShortUrlInfo(shortUrl);
     if (!data) return;
 
     setShortUrlInfo(data);
@@ -52,7 +50,7 @@ const MainPage = () => {
   const getShortUrlAnalyticsHandler = async (e: MouseEvent) => {
     e.preventDefault();
 
-    const data = await getShortUrlAnalytics(alias);
+    const data = await getShortUrlAnalytics(shortUrl);
     if (!data) return;
 
     setShortUrlAnalytics(data);
@@ -74,7 +72,7 @@ const MainPage = () => {
           <Input placeholder="Алиас" />
         </Form.Item>
 
-        <Form.Item name="expriesAt">
+        <Form.Item name="expiresAt">
           <DatePicker
             format="DD/MM/YYYY"
             placeholder="Дата окончания действия"
@@ -90,7 +88,7 @@ const MainPage = () => {
         </Form.Item>
       </Form>
 
-      {shortUrl && <CopyResult value={shortUrl} />}
+      {createdShortUrl && <CopyResult value={createdShortUrl} />}
 
       <Divider />
 
@@ -99,8 +97,8 @@ const MainPage = () => {
       <Flex vertical gap={20}>
         <Input
           placeholder="Вставьте короткую ссылку"
-          value={alias}
-          onChange={(e) => setAlias(e.currentTarget.value)}
+          value={shortUrl}
+          onChange={(e) => setShortUrl(e.currentTarget.value)}
         />
 
         <Flex gap={20}>
