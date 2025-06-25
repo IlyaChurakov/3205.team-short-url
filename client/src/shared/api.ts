@@ -1,4 +1,5 @@
-export const apiUrl = 'http://localhost:8001/api';
+import { apiUrl } from './config';
+
 const baseHeaders = { 'Content-Type': 'application/json' };
 
 export interface CreatedShortUrlResponse {
@@ -49,7 +50,7 @@ export async function getShortUrlInfo(shortUrl: string) {
     return data as unknown as ShortUrlInfoResponse;
   } catch (e) {
     console.log(e);
-    alert('Не удалось создать short url');
+    alert('Не удалось получить информацию о short url');
   }
 }
 
@@ -65,7 +66,7 @@ export async function getShortUrlAnalytics(shortUrl: string) {
     return data as unknown as ShortUrlAnalyticsResponse;
   } catch (e) {
     console.log(e);
-    alert('Не удалось создать short url');
+    alert('Не удалось получить аналитику');
   }
 }
 
@@ -76,6 +77,6 @@ export async function deleteShortUrl(shortUrl: string) {
     });
   } catch (e) {
     console.log(e);
-    alert('Не удалось создать short url');
+    alert('Не удалось удалить short url');
   }
 }
