@@ -37,11 +37,9 @@ export async function redirectToOriginalUrl(req: Request, res: Response<{}>, nex
   try {
     const { shortUrl } = req.params;
 
-    const alias = decodeURIComponent(shortUrl.split('/api/')[1]);
-
     const data = await prisma.shortUrl.findUnique({
       where: {
-        alias,
+        alias: shortUrl,
       },
     });
 
@@ -52,7 +50,7 @@ export async function redirectToOriginalUrl(req: Request, res: Response<{}>, nex
     if (data.expiresAt && data.expiresAt < currentDate)
       throw ApiError.Gone('Срок действия ссылки истёк');
 
-    const ip = req.ip || 'unknown';
+    const ip = getClientIp(req) || 'unknown';
 
     await prisma.analytics.create({
       data: {
