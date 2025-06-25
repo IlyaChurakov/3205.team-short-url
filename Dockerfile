@@ -34,4 +34,4 @@ COPY --from=builder /usr/src/node_modules ./node_modules
 COPY --from=builder /usr/src/prisma ./prisma
 COPY --from=client /usr/src/dist ./client
 
-CMD ["node", "server.js"]
+CMD ["npm", "run", "start:migrate"]
