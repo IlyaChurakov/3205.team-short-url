@@ -6,6 +6,8 @@ import morgan from 'morgan';
 import router from './routes';
 import ErrorMiddleware from './middlewares/Error.middleware';
 import prisma from './db';
+import path from 'path';
+import { readFileSync } from 'fs';
 
 const app = express();
 
@@ -20,6 +22,20 @@ const main = async () => {
 
   app.use('/api', router);
 
+  if (config.staticPath) {
+    const index = readFileSync(path.join(config.staticPath, 'index.html'), 'utf-8').replace(
+      '<head>',
+      `<head><base href="${config.baseUrl}" />`,
+    );
+
+    app.use(express.static(config.staticPath, { index: false }));
+    app.use(/.*/, (_, res, next) => {
+      if (res.headersSent) return next();
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(index);
+    });
+  }
+
   app.use(ErrorMiddleware);
 
   app.listen(config.port);
@@ -28,4 +44,4 @@ const main = async () => {
 main()
   .then(() => console.log(`Server is running on port ${config.port}`))
   .catch((e) => console.error(e))
-  .finally(async () => await prisma.$disconnect())
+  .finally(async () => await prisma.$disconnect());

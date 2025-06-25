@@ -16,12 +16,14 @@ services:
   api:
     platform: linux/amd64
     build:
-      context: ./server
+      context: .
+      dockerfile: Dockerfile
     image: 'short-url-api:latest'
     container_name: short-url-api
     restart: on-failure
     environment:
       - DATABASE_URL=postgresql://user:1234@db:5432/shorturl?schema=public
+      - BASE_URL=http://localhost:8001
     ports:
       - 8001:8000
     networks:
